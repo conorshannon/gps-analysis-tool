@@ -1,0 +1,32 @@
+services:
+  app:
+    image: python:3.12-slim
+    working_dir: /app
+    volumes:
+      - ./:/app
+    ports:
+      - "3000:3000"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - SPORT_GPS_DB=/app/data/sport_gps.db
+    command:
+      - sh
+      - -ec
+      - |
+        mkdir -p /app/data &&
+        pip install --no-cache-dir -r requirements.txt &&
+        exec streamlit run Qwen_python_20260916_959e2d74d.py \
+          --server.port=3000 \
+          --server.address=0.0.0.0 \
+          --server.headless=true \
+          --server.runOnSave=true \
+          --browser.gatherUsageStats=false \
+          --server.enableXsrfProtection=false \
+          --server.enableCORS=false
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:3000/_stcore/health').read()"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 90s
+    restart: on-failure

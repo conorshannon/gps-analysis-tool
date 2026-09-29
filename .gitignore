@@ -1,0 +1,4 @@
+sport_gps.db
+data/
+__pycache__/
+*.pyc
